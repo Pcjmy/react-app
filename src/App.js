@@ -1,51 +1,58 @@
 import { createContext, useContext, useState } from 'react';
 
-const ThemeContext = createContext(null);
+const CurrentUserContext = createContext(null);
 
 function App() {
-  const [theme, setTheme] = useState('light');
+  const [currentUser, setCurrentUser] = useState(null);
   return (
-    <ThemeContext.Provider value={theme}>
+    <CurrentUserContext.Provider
+      value={{
+        currentUser,
+        setCurrentUser
+      }}
+    >
       <Form />
-      <label>
-        <input
-          type="checkbox"
-          checked={theme === 'dark'}
-          onChange={(e) => {
-            setTheme(e.target.checked ? 'dark' : 'light')
-          }}
-        />
-        Use dark mode
-      </label>
-    </ThemeContext.Provider>
-  )
+    </CurrentUserContext.Provider>
+  );
 }
 
 function Form({ children }) {
   return (
     <Panel title="Welcome">
-      <Button>Sign up</Button>
-      <Button>Log in</Button>
+      <LoginButton />
     </Panel>
   );
 }
 
-function Panel({ title, children }) {
-  const theme = useContext(ThemeContext);
-  const className = 'panel-' + theme;
+function LoginButton() {
+  const {
+    currentUser,
+    setCurrentUser
+  } = useContext(CurrentUserContext);
+
+  if (currentUser !== null) {
+    return <p>You logged in as {currentUser.name}.</p>;
+  }
+
   return (
-    <section className={className}>
+    <Button onClick={() => {
+      setCurrentUser({ name: 'Advika' })
+    }}>Log in as Advika</Button>
+  );
+}
+
+function Panel({ title, children }) {
+  return (
+    <section className="panel">
       <h1>{title}</h1>
       {children}
     </section>
   )
 }
 
-function Button({ children }) {
-  const theme = useContext(ThemeContext);
-  const className = 'button-' + theme;
+function Button({ children, onClick }) {
   return (
-    <button className={className}>
+    <button className="button" onClick={onClick}>
       {children}
     </button>
   );
